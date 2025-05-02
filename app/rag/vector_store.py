@@ -19,7 +19,11 @@ class VectorStore:
         """ドキュメントとその埋め込みをベクトルストアに追加"""
         try:
             embeddings_np = np.array(embeddings, dtype=np.float32)
+
+            # FAISSインデックスにベクトルを追加
             self.index.add(embeddings_np)
+
+            # 元のドキュメントを保存
             self.documents.extend(documents)
             self.logger.info(f"{len(documents)}個のドキュメントをベクトルストアに追加しました")
         except Exception as e:
@@ -33,10 +37,12 @@ class VectorStore:
             
             results = []
             for i, idx in enumerate(indices[0]):
-                if idx >= 0 and idx < len(self.documents):  # 有効なインデックスかチェック
+                # FAISSは検索時に類似のものがない場合、-1を返すことがあるため、インデックスが有効かチェック
+                if idx >= 0 and idx < len(self.documents):
                     results.append((self.documents[idx], float(distances[0][i])))
             
             # 距離でソート（最も近いものが先頭）
+            # results = [(document1, distance1), (document2, distance2), ...]
             results.sort(key=lambda x: x[1])
             
             # ドキュメントと距離を分離

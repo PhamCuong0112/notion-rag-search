@@ -1,6 +1,13 @@
 import argparse
 import logging
 import os
+import sys
+from pathlib import Path
+
+# プロジェクトルートをPythonパスに追加
+project_root = str(Path(__file__).parent.parent.absolute())
+sys.path.insert(0, project_root)
+
 from tqdm import tqdm
 
 from app.core.config import get_settings
@@ -28,40 +35,23 @@ def build_index():
     # ベクトルストア
     vector_store = VectorStore()
     
-    # データベースからページを取得
-    logger.info(f"データベース {settings.notion_database_id} からページ一覧を取得しています...")
-    pages = notion.get_database_pages()
+    # 親ページとその子ページを取得
+    logger.info(f"親ページ {settings.notion_page_id} の内容を取得しています...")
+    pages = notion.get_parent_page_content()
     
     if not pages:
-        logger.error("ページが見つかりませんでした。Notion APIトークンとデータベースIDを確認してください。")
+        logger.error("ページが見つかりませんでした。Notion APIトークンと親ページIDを確認してください。")
         return
     
     logger.info(f"{len(pages)}個のページが見つかりました。処理を開始します...")
     
-    # 各ページのコンテンツを取得して処理
+    # 各ページのコンテンツを処理
     total_chunks = 0
     for page in tqdm(pages, desc="ページ処理中"):
         page_id = page["id"]
-        
-        # ページのタイトルを取得
-        title = "不明なページ"
-        try:
-            title_property = page.get("properties", {}).get("title", {})
-            if "title" in title_property:
-                title = title_property["title"][0]["plain_text"]
-            elif "Name" in page.get("properties", {}):
-                name_property = page["properties"]["Name"]
-                if "title" in name_property:
-                    title = name_property["title"][0]["plain_text"]
-        except (KeyError, IndexError):
-            pass
-        
-        # ページURLの構築
-        page_url = f"https://notion.so/{page_id.replace('-', '')}"
-        
-        # ページのコンテンツを取得
-        blocks = notion.get_page_content(page_id)
-        text = notion.extract_text_from_blocks(blocks)
+        title = page["title"]
+        page_url = page["url"]
+        text = page["content"]
         
         if not text:
             logger.warning(f"ページ '{title}' にテキストコンテンツがありません。スキップします。")
@@ -74,7 +64,7 @@ def build_index():
             "url": page_url
         }
         
-        # テキストを分割
+        # テキストを分割してメタデータを追加して返す
         chunks = text_processor.split_text(text, metadata)
         
         if not chunks:

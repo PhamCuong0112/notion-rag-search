@@ -10,22 +10,6 @@ class NotionAPI:
         self.client = Client(auth=token or settings.notion_token)
         self.logger = logging.getLogger(__name__)
     
-    def get_database_pages(self, database_id: Optional[str] = None) -> List[Dict[str, Any]]:
-        """データベース内のすべてのページを取得"""
-        settings = get_settings()
-        db_id = database_id or settings.notion_database_id
-        
-        if not db_id:
-            self.logger.error("データベースIDが設定されていません")
-            return []
-        
-        try:
-            response = self.client.databases.query(database_id=db_id)
-            return response.get("results", [])
-        except Exception as e:
-            self.logger.error(f"データベースの取得中にエラーが発生しました: {str(e)}")
-            return []
-    
     def get_page_content(self, page_id: str) -> Dict[str, Any]:
         """ページの内容を取得"""
         try:
@@ -33,6 +17,71 @@ class NotionAPI:
         except Exception as e:
             self.logger.error(f"ページ内容の取得中にエラーが発生しました: {str(e)}")
             return {"results": []}
+    
+    def get_parent_page_content(self) -> List[Dict[str, Any]]:
+        """親ページとその子ページの内容を再帰的に取得"""
+        settings = get_settings()
+        page_id = settings.notion_page_id
+        
+        if not page_id:
+            self.logger.error("親ページIDが設定されていません")
+            return []
+        
+        try:
+            # 親ページの基本情報を取得
+            page_info = self.client.pages.retrieve(page_id=page_id)
+            
+            # ページのコンテンツを取得
+            blocks = self.get_page_content(page_id)
+            
+            # ページのタイトルを取得
+            title = "不明なページ"
+            try:
+                if "properties" in page_info and "title" in page_info["properties"]:
+                    title_property = page_info["properties"]["title"]
+                    title = title_property["title"][0]["plain_text"]
+            except (KeyError, IndexError):
+                pass
+            
+            # ページURLの構築
+            # APIではハイフン付きで変えるので、URLを構築する際にハイフンを削除
+            page_url = f"https://notion.so/{page_id.replace('-', '')}"
+            
+            # テキストを抽出
+            text = self.extract_text_from_blocks(blocks)
+            
+            result = [{
+                "id": page_id,
+                "title": title,
+                "url": page_url,
+                "content": text
+            }]
+            
+            # 子ページを再帰的に取得 キーが存在しない場合は空のリストを返す
+            for block in blocks.get("results", []):
+                if block.get("type") == "child_page":
+                    child_page_id = block.get("id")
+                    child_title = block.get("child_page", {}).get("title", "子ページ")
+                    
+                    # 子ページのコンテンツを取得
+                    child_blocks = self.get_page_content(child_page_id)
+                    child_text = self.extract_text_from_blocks(child_blocks)
+                    
+                    child_url = f"https://notion.so/{child_page_id.replace('-', '')}"
+                    
+                    # 子ページの情報を追加
+                    result.append({
+                        "id": child_page_id,
+                        "title": child_title,
+                        "url": child_url,
+                        "content": child_text
+                    })
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"親ページの取得中にエラーが発生しました: {str(e)}")
+            return []
     
     def extract_text_from_blocks(self, blocks: Dict[str, Any]) -> str:
         """Notionブロックからテキストを抽出"""

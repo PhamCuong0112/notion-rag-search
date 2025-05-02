@@ -5,13 +5,13 @@ from typing import Optional
 class Settings(BaseSettings):
     # Notion API設定
     notion_token: str
-    notion_database_id: Optional[str] = None
+    notion_page_id: Optional[str] = None  # 親ページID
     
     # LLM設定
     llm_model: str = "llama2-7b-q4"
     
     # 埋め込みモデル設定
-    embedding_model: str = "BAAI/bge-small-ja"
+    embedding_model: str = "intfloat/multilingual-e5-small"
     
     # ベクトルストア設定
     vector_store_path: str = "data"

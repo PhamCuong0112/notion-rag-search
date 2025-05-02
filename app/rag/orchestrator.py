@@ -20,7 +20,7 @@ class RAGOrchestrator:
     def retrieve(self, query: str) -> Tuple[List[str], List[str]]:
         """クエリに関連するコンテキストを検索"""
         try:
-            # クエリの埋め込み生成
+            # クエリの埋め込みしてベクトル生成
             query_embedding = self.text_processor.embed_query(query)
             
             # 類似検索
