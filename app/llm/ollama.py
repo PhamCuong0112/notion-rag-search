@@ -45,14 +45,21 @@ class OllamaClient:
             })
             
             # Ollamaにリクエスト送信
+            self.logger.info(f"モデル {self.model} にリクエストを送信中...")
             response = requests.post(
                 f"{self.api_base}/chat",
                 headers={"Content-Type": "application/json"},
                 data=json.dumps({
                     "model": self.model,
                     "messages": messages,
-                    "stream": False
-                })
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.1,  # 低温度で決定的な応答に
+                        "num_ctx": 1024,     # コンテキスト長を制限
+                        "num_predict": 256   # 生成トークン数を制限
+                    }
+                }),
+                timeout=180  # タイムアウトを60秒に短縮
             )
             
             if response.status_code == 200:

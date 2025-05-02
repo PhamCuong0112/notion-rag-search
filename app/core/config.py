@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     notion_page_id: Optional[str] = None  # 親ページID
     
     # LLM設定
-    llm_model: str = "llama2-7b-q4"
+    llm_model: str = "gemma:2b"  # より軽量なgemma:2bモデルを使用
     
     # 埋め込みモデル設定
     embedding_model: str = "intfloat/multilingual-e5-small"

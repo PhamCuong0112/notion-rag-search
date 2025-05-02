@@ -1,5 +1,10 @@
 import argparse
 import logging
+import sys
+import os
+
+# プロジェクトルートをシステムパスに追加
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.rag.orchestrator import RAGOrchestrator
 from app.llm.ollama import OllamaClient

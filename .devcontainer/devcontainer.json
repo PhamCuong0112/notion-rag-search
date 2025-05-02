@@ -9,6 +9,10 @@
       "extensions": ["ms-python.python", "ms-python.vscode-pylance"]
     }
   },
+  "hostRequirements": {
+    "memory": "16gb"
+  },
   "forwardPorts": [7860],
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "postStartCommand": "ollama serve > /var/log/ollama.log 2>&1 & sleep 5 && (ollama list | grep -q \"phi\" || ollama pull phi)"
 }
