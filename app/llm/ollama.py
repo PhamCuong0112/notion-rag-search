@@ -10,7 +10,7 @@ class OllamaClient:
         settings = get_settings()
         self.logger = logging.getLogger(__name__)
         self.model = model_name or settings.llm_model
-        self.api_base = "http://localhost:11434/api"
+        self.api_base = settings.ollama_api_base
     
     def generate_response(self, query: str, contexts: List[str], history: Optional[List[Dict[str, Any]]] = None) -> str:
         """コンテキストを用いてLLMで回答を生成"""

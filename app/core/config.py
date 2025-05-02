@@ -8,7 +8,8 @@ class Settings(BaseSettings):
     notion_page_id: Optional[str] = None  # 親ページID
     
     # LLM設定
-    llm_model: str = "gemma:2b"  # より軽量なgemma:2bモデルを使用
+    llm_model: str = "qwen3:4b"  # より軽量なgemma:2bモデルを使用
+    ollama_api_base: str = "http://host.docker.internal:11434/api"  # ホストマシンのOllamaにアクセス
     
     # 埋め込みモデル設定
     embedding_model: str = "intfloat/multilingual-e5-small"
