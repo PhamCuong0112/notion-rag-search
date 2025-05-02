@@ -5,6 +5,9 @@ Notionのマニュアルやドキュメントをベクトルデータベース�
 ## 動かした時のイメージ
 ![デモアニメーション](.github/images/chatbot.gif)
 
+## Deepwiki by Devin
+https://deepwiki.com/yukiyoshimura/notion-rag-search
+
 ## 技術スタック
 
 ### バックエンド
