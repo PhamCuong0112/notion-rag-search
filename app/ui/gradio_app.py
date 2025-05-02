@@ -20,7 +20,7 @@ def create_gradio_app():
     llm = OllamaClient()
     
     def clean_response(text: str) -> str:
-        """LLMの応答から<think>タグとその内容を除去する"""
+        """LLMの応答から<think>タグとその内容を除去する これをやらないとchat画面には何も出ない"""
         # <think>...</think>パターンを削除
         cleaned_text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
         

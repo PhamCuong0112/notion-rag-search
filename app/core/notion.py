@@ -28,7 +28,19 @@ class NotionAPI:
             return []
         
         try:
-            # 親ページの基本情報を取得
+            result = []
+            # 再帰的に親ページとすべての子ページを処理
+            self._process_page_recursive(page_id, result)
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"親ページの取得中にエラーが発生しました: {str(e)}")
+            return []
+    
+    def _process_page_recursive(self, page_id: str, result: List[Dict[str, Any]]) -> None:
+        """ページとその子ページを再帰的に処理する"""
+        try:
+            # ページの基本情報を取得
             page_info = self.client.pages.retrieve(page_id=page_id)
             
             # ページのコンテンツを取得
@@ -50,38 +62,23 @@ class NotionAPI:
             # テキストを抽出
             text = self.extract_text_from_blocks(blocks)
             
-            result = [{
+            # 現在のページ情報を結果リストに追加
+            result.append({
                 "id": page_id,
                 "title": title,
                 "url": page_url,
                 "content": text
-            }]
+            })
             
-            # 子ページを再帰的に取得 キーが存在しない場合は空のリストを返す
+            # 子ページを再帰的に取得
             for block in blocks.get("results", []):
                 if block.get("type") == "child_page":
                     child_page_id = block.get("id")
-                    child_title = block.get("child_page", {}).get("title", "子ページ")
+                    # 子ページを再帰的に処理
+                    self._process_page_recursive(child_page_id, result)
                     
-                    # 子ページのコンテンツを取得
-                    child_blocks = self.get_page_content(child_page_id)
-                    child_text = self.extract_text_from_blocks(child_blocks)
-                    
-                    child_url = f"https://notion.so/{child_page_id.replace('-', '')}"
-                    
-                    # 子ページの情報を追加
-                    result.append({
-                        "id": child_page_id,
-                        "title": child_title,
-                        "url": child_url,
-                        "content": child_text
-                    })
-            
-            return result
-            
         except Exception as e:
-            self.logger.error(f"親ページの取得中にエラーが発生しました: {str(e)}")
-            return []
+            self.logger.error(f"ページID {page_id} の処理中にエラーが発生しました: {str(e)}")
     
     def extract_text_from_blocks(self, blocks: Dict[str, Any]) -> str:
         """Notionブロックからテキストを抽出"""
