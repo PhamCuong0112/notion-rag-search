@@ -53,6 +53,32 @@ TOP_K=5
 pip install -r requirements.txt
 ```
 
+### Ollamaのインストールと実行
+
+このシステムはOllamaを使用してローカルでLLMを実行します。以下の手順でOllamaをセットアップしてください。
+
+1. **Ollamaのインストール**:
+   - [Ollama公式サイト](https://ollama.com/download)から、お使いのOSに合わせたインストーラをダウンロードしてインストールします。
+   - Linux、macOS、Windowsに対応しています。
+
+2. **必要なモデルのダウンロード**:
+   ```bash
+   # デフォルトで使用するqwen3:4bモデルをダウンロード
+   ollama pull qwen3:4b
+   ```
+   - 初回実行時は数GB程度のモデルファイルがダウンロードされます。
+   - 別のモデルを使用する場合は、モデル名を変更して実行してください。
+
+3. **Ollamaサーバーの起動**:
+   ```bash
+   # Ollamaサーバーを起動（バックグラウンドで実行）
+   ollama serve
+   ```
+   - デフォルトでは http://localhost:11434 でサービスが提供されます。
+   - 環境変数 `OLLAMA_HOST` を設定することで、ホストやポートを変更できます。
+
+Dockerコンテナ内からOllamaにアクセスする場合、`.env`ファイルの`OLLAMA_API_BASE`が`http://host.docker.internal:11434/api`に設定されていることを確認してください。
+
 ## 使用方法
 
 ### 1. Notionデータのベクトル化とインデックス構築
