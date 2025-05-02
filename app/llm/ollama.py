@@ -54,9 +54,9 @@ class OllamaClient:
                     "messages": messages,
                     "stream": False,
                     "options": {
-                        "temperature": 0.1,  # 低温度で決定的な応答に
+                        "temperature": 0.7,  # 温度を0.7に変更
                         "num_ctx": 1024,     # コンテキスト長を制限
-                        "num_predict": 256   # 生成トークン数を制限
+                        "num_predict": 512   # 生成トークン数を制限
                     }
                 }),
                 timeout=180  # タイムアウトを60秒に短縮
