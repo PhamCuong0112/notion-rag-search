@@ -100,8 +100,8 @@ if __name__ == "__main__":
     settings = get_settings()
     index_path = f"{settings.vector_store_path}/index.faiss"
     
-    # インデックスが存在するかチェック
-    if os.path.exists(index_path) and not args.force:
-        logger.warning(f"インデックスファイル {index_path} が既に存在します。上書きする場合は --force オプションを使用してください。")
-    else:
-        build_index()
+    # # インデックスが存在するかチェック
+    # if os.path.exists(index_path) and not args.force:
+    #     logger.warning(f"インデックスファイル {index_path} が既に存在します。上書きする場合は --force オプションを使用してください。")
+    # else:
+    build_index()

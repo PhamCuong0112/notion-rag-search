@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     vector_store_path: str = "data"
     
     # RAG設定
-    chunk_size: int = 500
-    chunk_overlap: int = 50
+    chunk_size: int = 300
+    chunk_overlap: int = 30
     top_k: int = 5
     
     class Config:
